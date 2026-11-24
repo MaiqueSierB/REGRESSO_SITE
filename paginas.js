@@ -10,7 +10,16 @@ const corDe = id => `hsl(${[...String(id)].reduce((h, c) => (h * 31 + c.charCode
 const avatar = (p, tam = 44) => `<span class="av" style="--c:${corDe(p.id ?? p.user_id)};width:${tam}px;height:${tam}px;font-size:${tam * 0.38}px">${iniciais(p.nome)}</span>`;
 const quando = iso => new Date(iso).toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo', weekday: 'short', day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
 
+// Anúncio (AdSense): um bloco só, no rodapé de todas as páginas. Bloco "Money" (responsivo).
+const ADSENSE_CLIENTE = 'ca-pub-3476040476227672';
+const ADSENSE_BLOCO = process.env.ADSENSE_BLOCO || '7564930340';
+const scriptAnuncio = `<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_CLIENTE}" crossorigin="anonymous"></script>`;
+const blocoAnuncio = `<div class="anuncio"><small>Publicidade · ajuda a manter os bots no ar</small>
+<ins class="adsbygoogle" style="display:block" data-ad-client="${ADSENSE_CLIENTE}" data-ad-slot="${ADSENSE_BLOCO}" data-ad-format="auto" data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script></div>`;
+
 const CSS = `
+.anuncio{max-width:1120px;margin:0 auto 8px;padding:0 20px;overflow:hidden}.anuncio small{display:block;color:var(--fraco);font-size:12px;margin-bottom:6px}
 :root{--fundo:#0d0c12;--card:#17151f;--card2:#1f1c2a;--linha:#2a2638;--texto:#f1eff7;--fraco:#9a95ad;
 --a1:#7b2ff7;--a2:#f107a3;--a3:#ff8a00;--verde:#2fd27a;--amarelo:#f5c043;--vermelho:#ff5d6c}
 *{box-sizing:border-box;margin:0}html{background:var(--fundo)}
@@ -68,12 +77,13 @@ export function layout(titulo, atual, corpo, { fundo } = {}) {
     return `<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>${esc(titulo)} · Regresso</title><meta name="robots" content="noindex"><meta name="theme-color" content="#0d0c12">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='16' fill='%237b2ff7'/><text x='32' y='45' font-size='38' font-family='Arial' font-weight='900' fill='white' text-anchor='middle'>R</text></svg>">
-<style>${CSS}</style></head><body>
+<style>${CSS}</style>${scriptAnuncio}</head><body>
 ${fundo ? `<div class="fundo" style="background-image:url('${esc(fundo)}')"></div>` : ''}
 <header class="topo"><div class="in"><a class="logo" href="/">REGRESSO</a><nav class="nav">
 ${NAV.map(([h, t]) => `<a href="${h}"${atual === h ? ' class="on"' : ''}>${t}</a>`).join('')}
 <a href="${config.links.wrapped}">Wrapped</a></nav></div></header>
 <main>${corpo}</main>
+${blocoAnuncio}
 <footer><span>Dados dos bots do Regresso (RMDB, RGDB, bolão), atualizados a cada minuto.</span>
 <a href="${config.links.status}">Status dos bots</a><span>Capas: TMDB e RAWG.</span></footer>
 </body></html>`;

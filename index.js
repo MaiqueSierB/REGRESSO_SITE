@@ -56,9 +56,9 @@ http.createServer(async (req, res) => {
             return res.end(JSON.stringify({ ok: true, bot: 'Portal do Regresso' }));
         }
         if (url.pathname === '/robots.txt') {
-            // As páginas têm nome e notas da galera: fora do Google
+            // Só o robô do AdSense pode ler (para escolher anúncios); buscadores bloqueados (nomes e notas da galera)
             res.writeHead(200, { 'Content-Type': 'text/plain' });
-            return res.end('User-agent: *\nDisallow: /\n');
+            return res.end('User-agent: Mediapartners-Google\nAllow: /\n\nUser-agent: *\nDisallow: /\n');
         }
         const html = await rota(url);
         res.writeHead(html ? 200 : 404, { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'public, max-age=60' });
