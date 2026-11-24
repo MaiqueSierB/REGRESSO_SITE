@@ -73,7 +73,7 @@ footer{max-width:1120px;margin:0 auto;padding:24px 20px 40px;color:var(--fraco);
 @media(max-width:640px){.detalhe{grid-template-columns:1fr}.detalhe .capa{max-width:220px}.hero{padding:30px 20px}.grade{grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:12px}}
 `;
 
-const NAV = [['/', 'Início'], ['/filmes', 'Filmes'], ['/jogos', 'Jogos'], ['/galera', 'Galera'], ['/bolao', 'Bolão'], ['/gym', 'Gym Rats'], ['/torcidas', 'Torcidas']];
+const NAV = [['/', 'Início'], ['/filmes', 'Filmes'], ['/jogos', 'Jogos'], ['/galera', 'Galera'], ['/bolao', 'Bolão'], ['/torcidas', 'Torcidas']];
 
 export function layout(titulo, atual, corpo, { fundo } = {}) {
     return `<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
