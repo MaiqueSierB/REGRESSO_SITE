@@ -73,7 +73,7 @@ footer{max-width:1120px;margin:0 auto;padding:24px 20px 40px;color:var(--fraco);
 @media(max-width:640px){.detalhe{grid-template-columns:1fr}.detalhe .capa{max-width:220px}.hero{padding:30px 20px}.grade{grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:12px}}
 `;
 
-const NAV = [['/', 'Início'], ['/filmes', 'Filmes'], ['/jogos', 'Jogos'], ['/galera', 'Galera'], ['/bolao', 'Bolão'], ['/torcidas', 'Torcidas']];
+const NAV = [['/', 'Início'], ['/filmes', 'Filmes'], ['/jogos', 'Jogos'], ['/galera', 'Galera'], ['/bolao', 'Bolão'], ['/gym', '🔒 Gym Rats'], ['/torcidas', 'Torcidas']];
 
 export function layout(titulo, atual, corpo, { fundo } = {}) {
     return `<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
@@ -223,22 +223,32 @@ ${lista.length ? `<div class="duas">${lista.map(t => `<div class="card"><div sty
 
 export const pagina404 = () => layout('Não encontrado', '', '<div class="card"><h2 style="margin-top:0">Não achei essa página 🤔</h2><p><a class="tag" href="/">Voltar ao início</a></p></div>');
 
-const MESES = ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'];
-const nomeMes = m => `${MESES[Number(m.slice(5, 7)) - 1]} de ${m.slice(0, 4)}`;
+const dm = d => d.split('-').reverse().slice(0, 2).join('/');
+const nomeCiclo = c => `${dm(c.inicio)} a ${dm(c.fim)}`;
 export function paginaGym(g) {
-    const dia = d => d.split('-').reverse().slice(0, 2).join('/');
-    const corpo = `<section class="hero"><h1>Gym Rats</h1><p>1 treino por dia, com foto = 1 ponto. O ranking zera todo mês e o campeão é anunciado no dia 1.</p>
-<div class="nums"><div class="num"><b>${g.treinosMes}</b><span>treinos em ${esc(nomeMes(g.mes))}</span></div>
+    const corpo = `<section class="hero"><h1>Gym Rats</h1><p>1 treino por dia, com foto = 1 ponto, no máximo 5 por semana (segunda a domingo). Cada ciclo vai do dia 26 ao dia 25 e o campeão é anunciado no grupo no dia 26.</p>
+<div class="nums"><div class="num"><b>${g.treinos}</b><span>treinos no ciclo ${esc(nomeCiclo(g.ciclo))}</span></div>
 <div class="num"><b>${g.ranking.length}</b><span>pessoas treinando</span></div>
 <div class="num"><b>${g.ranking[0] ? esc(g.ranking[0].nome) : '—'}</b><span>liderando</span></div></div></section>
-${g.meses.length > 1 ? `<p style="margin-bottom:10px">${g.meses.map(m => `<a class="tag" href="/gym?mes=${m}"${m === g.mes ? ' style="border-color:var(--a1)"' : ''}>${esc(nomeMes(m))}</a>`).join('')}</p>` : ''}
-<div class="card"><h2 style="margin-top:0">Ranking de ${esc(nomeMes(g.mes))}</h2>${g.ranking.length ? `<table><tr><th>#</th><th>Quem</th><th class="n">Treinos</th><th class="n">Sequência</th></tr>
-${g.ranking.map(r => `<tr><td>${r.posicao <= 3 ? ['🥇', '🥈', '🥉'][r.posicao - 1] : r.posicao}</td><td><a class="pessoa" href="/galera/${esc(r.user_id)}">${avatar({ id: r.user_id, nome: r.nome }, 28)}${esc(r.nome)}</a></td>
+${g.ciclos.length > 1 ? `<p style="margin-bottom:10px">${g.ciclos.map(c => `<a class="tag" href="/gym?ciclo=${c.inicio}"${c.inicio === g.ciclo.inicio ? ' style="border-color:var(--a1)"' : ''}>${esc(nomeCiclo(c))}</a>`).join('')}</p>` : ''}
+<div class="card"><h2 style="margin-top:0">Ranking — ${esc(nomeCiclo(g.ciclo))}</h2>${g.ranking.length ? `<table><tr><th>#</th><th>Quem</th><th class="n">Treinos</th><th class="n">Sequência</th></tr>
+${g.ranking.map(r => `<tr><td>${r.posicao <= 3 ? ['🥇', '🥈', '🥉'][r.posicao - 1] : r.posicao}</td><td><span class="pessoa">${avatar({ id: r.user_id, nome: r.nome }, 28)}${esc(r.nome)}</span></td>
 <td class="n"><b>${r.pontos}</b></td><td class="n">${r.sequencia >= 2 ? `🔥 ${r.sequencia}` : r.sequencia ? '1' : '—'}</td></tr>`).join('')}</table>`
-        : '<p class="vazio">Ninguém treinou ainda neste mês.</p>'}
-<p class="sub" style="margin-top:10px">Marque o treino com /treino (foto) no Discord ou mandando a foto com !treino no Zap.</p></div>
+        : '<p class="vazio">Ninguém treinou ainda neste ciclo.</p>'}
+<p class="sub" style="margin-top:10px">Marque o treino mandando a foto com <b>!treino</b> no grupo do Gym Rats.</p></div>
+<p style="margin-top:14px"><a class="tag" href="/gym/sair">Sair</a></p>
 <h2>Mural</h2>${g.mural.length ? `<div class="mural">${g.mural.map(c => `<figure><img src="/gym/foto/${esc(c.foto)}" alt="" loading="lazy">
-<figcaption><b>${esc(c.nome)}</b><span class="sub">${dia(c.dia)}${c.legenda ? ` · ${esc(c.legenda)}` : ''}</span></figcaption></figure>`).join('')}</div>`
-        : '<p class="vazio">Sem fotos ainda.</p>'}`;
+<figcaption><b>${esc(c.nome)}</b><span class="sub">${dm(c.dia)}${c.legenda ? ` · ${esc(c.legenda)}` : ''}</span></figcaption></figure>`).join('')}</div>`
+        : '<p class="vazio">Sem fotos neste ciclo.</p>'}`;
+    return layout('Gym Rats', '/gym', corpo);
+}
+
+export function paginaLoginGym({ erro, semSenha } = {}) {
+    const corpo = `<div class="card" style="max-width:420px;margin:40px auto">
+<h2 style="margin-top:0">🔒 Gym Rats</h2>
+${semSenha ? '<p class="vazio">A senha do Gym Rats ainda não foi configurada.</p>' : `<p class="sub" style="margin-bottom:14px">Área do grupo do treino. Digite a senha do grupo.</p>
+<form class="busca" method="post" action="/gym/entrar" style="flex-direction:column">
+<input type="password" name="senha" placeholder="Senha do grupo" autocomplete="current-password" required autofocus>
+<button>Entrar</button></form>${erro ? `<p style="color:var(--vermelho);margin-top:6px">${esc(erro)}</p>` : ''}`}</div>`;
     return layout('Gym Rats', '/gym', corpo);
 }

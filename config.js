@@ -25,6 +25,8 @@ const config = {
         gym: process.env.GYM_DB || `${BASE}/gym-data/gym.sqlite`
     },
     fotosGym: process.env.GYM_FOTOS || `${BASE}/gym-data/fotos`,
+    // Senha do Gym Rats: o Maique cria /home/u243267678/domains/mrbnexus.com.br/.gym.env com GYM_SENHA=...
+    gymSenha: process.env.GYM_SENHA || lerChave(process.env.GYM_ENV || `${BASE}/.gym.env`, 'GYM_SENHA'),
     // cache das capas (TMDB/RAWG) para não buscar de novo a cada reinício
     cacheCapas: process.env.CAPAS_CACHE || `${BASE}/site-data/capas.json`,
     tmdbKey: process.env.TMDB_API_KEY || lerChave(process.env.RMDB_ENV || `${BASE}/.rmdb.env`, 'TMDB_API_KEY'),
@@ -35,7 +37,7 @@ const config = {
     }
 };
 
-console.log(`Config: tmdb=${config.tmdbKey ? 'ok' : 'faltando'} rawg=${config.rawgKey ? 'ok' : 'faltando'} ` +
+console.log(`Config: gym_senha=${config.gymSenha ? 'ok' : 'faltando'} tmdb=${config.tmdbKey ? 'ok' : 'faltando'} rawg=${config.rawgKey ? 'ok' : 'faltando'} ` +
     `bancos=${Object.entries(config.bancos).map(([k, v]) => `${k}:${fs.existsSync(v) ? 'ok' : 'não achei'}`).join(' ')}`);
 
 export default config;

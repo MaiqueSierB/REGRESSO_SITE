@@ -185,12 +185,21 @@ function sequencia(userId) {
     while (dias.has(d)) { n++; d = antes(d); }
     return n;
 }
-export function gym(mes = hojeBR().slice(0, 7)) {
+export function cicloDe(dia = hojeBR()) {
+    const [a, m, d] = dia.split('-').map(Number);
+    const ini = d >= 26 ? new Date(Date.UTC(a, m - 1, 26)) : new Date(Date.UTC(a, m - 2, 26));
+    const fim = new Date(Date.UTC(ini.getUTCFullYear(), ini.getUTCMonth() + 1, 25));
+    return { inicio: ini.toISOString().slice(0, 10), fim: fim.toISOString().slice(0, 10) };
+}
+export function gym(inicio) {
+    const ciclo = cicloDe(inicio ?? hojeBR());
     const ranking = todos('gym', `SELECT user_id, MAX(nome) AS nome, COUNT(*) AS pontos, MAX(dia) AS ultimo
-        FROM checkins WHERE substr(dia, 1, 7) = ? GROUP BY user_id ORDER BY pontos DESC, ultimo ASC`, mes)
+        FROM checkins WHERE dia BETWEEN ? AND ? GROUP BY user_id ORDER BY pontos DESC, ultimo ASC`, ciclo.inicio, ciclo.fim)
         .map((r, i) => ({ ...r, posicao: i + 1, nome: nomes().get(r.user_id) ?? r.nome, sequencia: sequencia(r.user_id) }));
-    const mural = todos('gym', 'SELECT user_id, nome, dia, foto, legenda FROM checkins WHERE foto IS NOT NULL ORDER BY id DESC LIMIT 36')
+    const mural = todos('gym', 'SELECT user_id, nome, dia, foto, legenda FROM checkins WHERE foto IS NOT NULL AND dia BETWEEN ? AND ? ORDER BY id DESC LIMIT 48', ciclo.inicio, ciclo.fim)
         .map(c => ({ ...c, nome: nomes().get(c.user_id) ?? c.nome }));
-    const meses = todos('gym', 'SELECT DISTINCT substr(dia, 1, 7) AS m FROM checkins ORDER BY m DESC').map(r => r.m);
-    return { mes, ranking, mural, meses, treinosMes: ranking.reduce((s, r) => s + r.pontos, 0) };
+    const ciclos = [...new Set(todos('gym', 'SELECT DISTINCT dia FROM checkins').map(r => cicloDe(r.dia).inicio))].sort().reverse()
+        .map(ini => cicloDe(ini));
+    if (!ciclos.some(c => c.inicio === ciclo.inicio)) ciclos.unshift(ciclo);
+    return { ciclo, ranking, mural, ciclos, treinos: ranking.reduce((s, r) => s + r.pontos, 0) };
 }
