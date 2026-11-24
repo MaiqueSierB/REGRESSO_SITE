@@ -21,8 +21,10 @@ const config = {
         rgdb: process.env.RGDB_DB || `${BASE}/rgdb-data/servidor.sqlite`,
         bolao: process.env.BOLAO_DB || `${BASE}/bolao-data/bolao.sqlite`,
         aniv: process.env.ANIV_DB || `${BASE}/aniversario-data/servidor.sqlite`,
-        zap: process.env.ZAP_DB || `${BASE}/zap-data/zap.sqlite`
+        zap: process.env.ZAP_DB || `${BASE}/zap-data/zap.sqlite`,
+        gym: process.env.GYM_DB || `${BASE}/gym-data/gym.sqlite`
     },
+    fotosGym: process.env.GYM_FOTOS || `${BASE}/gym-data/fotos`,
     // cache das capas (TMDB/RAWG) para não buscar de novo a cada reinício
     cacheCapas: process.env.CAPAS_CACHE || `${BASE}/site-data/capas.json`,
     tmdbKey: process.env.TMDB_API_KEY || lerChave(process.env.RMDB_ENV || `${BASE}/.rmdb.env`, 'TMDB_API_KEY'),

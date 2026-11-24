@@ -174,3 +174,23 @@ export function torcidas() {
     }
     return [...porTime].map(([time, gente]) => ({ time, gente })).sort((a, b) => b.gente.length - a.gente.length || a.time.localeCompare(b.time));
 }
+
+// ---------- Gym Rats ----------
+const hojeBR = () => new Date().toLocaleDateString('sv-SE', { timeZone: 'America/Sao_Paulo' });
+function sequencia(userId) {
+    const dias = new Set(todos('gym', 'SELECT dia FROM checkins WHERE user_id = ?', userId).map(r => r.dia));
+    const antes = d => { const x = new Date(`${d}T12:00:00Z`); x.setUTCDate(x.getUTCDate() - 1); return x.toISOString().slice(0, 10); };
+    let d = dias.has(hojeBR()) ? hojeBR() : antes(hojeBR());
+    let n = 0;
+    while (dias.has(d)) { n++; d = antes(d); }
+    return n;
+}
+export function gym(mes = hojeBR().slice(0, 7)) {
+    const ranking = todos('gym', `SELECT user_id, MAX(nome) AS nome, COUNT(*) AS pontos, MAX(dia) AS ultimo
+        FROM checkins WHERE substr(dia, 1, 7) = ? GROUP BY user_id ORDER BY pontos DESC, ultimo ASC`, mes)
+        .map((r, i) => ({ ...r, posicao: i + 1, nome: nomes().get(r.user_id) ?? r.nome, sequencia: sequencia(r.user_id) }));
+    const mural = todos('gym', 'SELECT user_id, nome, dia, foto, legenda FROM checkins WHERE foto IS NOT NULL ORDER BY id DESC LIMIT 36')
+        .map(c => ({ ...c, nome: nomes().get(c.user_id) ?? c.nome }));
+    const meses = todos('gym', 'SELECT DISTINCT substr(dia, 1, 7) AS m FROM checkins ORDER BY m DESC').map(r => r.m);
+    return { mes, ranking, mural, meses, treinosMes: ranking.reduce((s, r) => s + r.pontos, 0) };
+}
